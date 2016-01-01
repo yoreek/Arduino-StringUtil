@@ -16,7 +16,7 @@ install:
   - ln -s $PWD /usr/local/share/arduino/libraries/StringUtil
 
 script:
-  - arduino --verify --board ${BOARD} $PWD/examples/examples/StringUtil/StringUtil.ino
+  - arduino --verify --board ${BOARD} $PWD/examples/StringUtil/StringUtil.ino
 
 notifications:
   email:
