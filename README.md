@@ -1,6 +1,6 @@
 # Arduino string formatting library that support float data type
 
-* Version: 1.0
+* Version: 1.0.0
 * Release Date: 2016-01-02
 
 ## What is this repository for? ##
