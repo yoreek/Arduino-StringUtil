@@ -1,4 +1,4 @@
-# Arduino string formatting library that support float data type
+# Arduino string formatting library that support float data type [![Build Status](https://travis-ci.org/yoreek/Arduino-StringUtil.svg?branch=master)](https://travis-ci.org/yoreek/Arduino-StringUtil)
 
 * Version: 1.0.0
 * Release Date: 2016-01-02
