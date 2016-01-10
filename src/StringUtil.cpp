@@ -113,7 +113,7 @@ static size_t printNum(Print &out, uint32_t num, char zero, const char *hex, uns
 static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
     size_t        slen, n = 0;
     char          c, zero, *p;
-    unsigned long width, sign, maxWidth, fracWidth, scale, i;
+    unsigned long width, sign, fracWidth, scale, i;
     int32_t       i32;
     uint32_t      ui32, frac;
     double        f;
@@ -126,7 +126,6 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
     width      = 0;
     sign       = 1;
     hex        = NULL;
-    maxWidth   = 0;
     fracWidth  = 6;
     slen       = (size_t) -1;
 
@@ -140,10 +139,6 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
         switch (c) {
             case 'u':
                 sign = 0;
-                c = fmt.read();
-                continue;
-            case 'm':
-                maxWidth = 1;
                 c = fmt.read();
                 continue;
             case 'X':
@@ -198,9 +193,6 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
                 i32 = (int32_t) va_arg(args, int);
             } else {
                 ui32 = (uint32_t) va_arg(args, unsigned int);
-            }
-            if (maxWidth) {
-                width = __NUM_MAX_LEN__;
             }
             break;
         case 'd':
@@ -279,6 +271,29 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
             n += out.write(':');
             n += printNum(out, minute(cacheTime), '0', 0, 2);
             n += out.write(':');
+            n += printNum(out, second(cacheTime), '0', 0, 2);
+            goto FINISH;
+        case 'Y':
+            // YYYY
+            n += printNum(out, year(cacheTime), '0', 0, 4);
+        case 'M':
+            // MM
+            n += printNum(out, month(cacheTime), '0', 0, 2);
+            goto FINISH;
+        case 'D':
+            // DD
+            n += printNum(out, day(cacheTime), '0', 0, 2);
+            goto FINISH;
+        case 'H':
+            // HH
+            n += printNum(out, hour(cacheTime), '0', 0, 2);
+            goto FINISH;
+        case 'm':
+            // MM
+            n += printNum(out, minute(cacheTime), '0', 0, 2);
+            goto FINISH;
+        case 'S':
+            // SS
             n += printNum(out, second(cacheTime), '0', 0, 2);
             goto FINISH;
 #endif

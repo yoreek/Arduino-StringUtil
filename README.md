@@ -115,6 +115,8 @@ Included on example folder, available on Arduino IDE.
 
 ## Version History ##
 
+ * 1.0.1 (2016-01-10): Added formats: %Y, %M, %D, %H, %m, %S
+
  * 1.0.0 (2016-01-02): Initial version.
 
 
