@@ -276,6 +276,7 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
         case 'Y':
             // YYYY
             n += printNum(out, year(cacheTime), '0', 0, 4);
+            goto FINISH;
         case 'M':
             // MM
             n += printNum(out, month(cacheTime), '0', 0, 2);

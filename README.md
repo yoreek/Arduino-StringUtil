@@ -1,7 +1,7 @@
 # Arduino string formatting library that support float data type [![Build Status](https://travis-ci.org/yoreek/Arduino-StringUtil.svg?branch=master)](https://travis-ci.org/yoreek/Arduino-StringUtil)
 
-* Version: 1.0.0
-* Release Date: 2016-01-02
+* Version: 1.0.2
+* Release Date: 2016-01-11
 
 ## What is this repository for? ##
 
@@ -114,6 +114,8 @@ Included on example folder, available on Arduino IDE.
 
 
 ## Version History ##
+
+ * 1.0.2 (2016-01-11): Fixed bug with '%Y'
 
  * 1.0.1 (2016-01-10): Added formats: %Y, %M, %D, %H, %m, %S
 
