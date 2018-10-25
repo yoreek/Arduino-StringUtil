@@ -9,7 +9,7 @@
 #define USE_TIME
 
 #ifdef USE_TIME
-#include <Time.h>
+#include <TimeLib.h>
 #endif
 
 #ifndef __NUM_MAX_LEN__
@@ -110,13 +110,55 @@ static size_t printNum(Print &out, uint32_t num, char zero, const char *hex, uns
     return n;
 }
 
+static size_t escapePrint(Print &out, char c, uint8_t escape) {
+    size_t n = 0;
+
+    if (!escape) {
+        return out.print(c);
+    }
+
+    switch (c) {
+        case 0x9:
+            n = out.print("\\t");
+            break;
+        case 0xA:
+            n = out.print("\\n");
+            break;
+        case 0xD:
+            n = out.print("\\r");
+            break;
+        case '"':
+            n = out.print("\"");
+            break;
+        case '\\':
+            n = out.print("\\");
+            break;
+        case 0x20 ... 0x21:
+        case 0x23 ... 0x5B:
+        case 0x5D ... 0x7E:
+            n = out.print(c);
+            break;
+        default:
+            n = out.print("x");
+            n += out.print((uint8_t) c, HEX);
+            break;
+    }
+
+    return n;
+}
+
 static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
     size_t        slen, n = 0;
-    char          c, zero, *p;
-    unsigned long width, sign, fracWidth, scale, i;
+    char          c, c2, zero, *p;
+    unsigned long width, sign, fracWidth;
+    uint8_t       escape;
     int32_t       i32;
-    uint32_t      ui32, frac;
+    uint32_t      ui32;
+#ifndef WITHOUT_STRING_UTIL_FLOAT
+    unsigned long scale, i;
+    uint32_t      frac;
     double        f;
+#endif
     const char   *hex;
 
     if ((c = fmt.read()) == '\0')
@@ -125,6 +167,7 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
     zero       = ((c == '0') ? '0' : ' ');
     width      = 0;
     sign       = 1;
+    escape     = 0;
     hex        = NULL;
     fracWidth  = 6;
     slen       = (size_t) -1;
@@ -161,6 +204,10 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
                 slen = va_arg(args, size_t);
                 c = fmt.read();
                 continue;
+            case '#':
+                escape = 1;
+                c = fmt.read();
+                continue;
             default:
                 break;
         }
@@ -171,12 +218,25 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
         case 's':
             p = va_arg(args, char *);
             if (slen == (size_t) -1) {
-                while (*p && out.write(*p++)) {
+                while (*p && escapePrint(out, *p++, escape)) {
                     n++;
                 }
             }
             else {
-                while (slen-- && *p && out.write(*p++)) {
+                while (slen-- && *p && escapePrint(out, *p++, escape)) {
+                    n++;
+                }
+            }
+            goto FINISH;
+        case 'P':
+            p = va_arg(args, char *);
+            if (slen == (size_t) -1) {
+                while ((c2 = pgm_read_byte(p++)) && escapePrint(out, c2, escape)) {
+                    n++;
+                }
+            }
+            else {
+                while (slen-- && (c2 = pgm_read_byte(p++)) && escapePrint(out, c2, escape)) {
                     n++;
                 }
             }
@@ -209,6 +269,7 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
                 ui32 = (uint32_t) va_arg(args, unsigned long);
             }
             break;
+#ifndef WITHOUT_STRING_UTIL_FLOAT
         case 'f':
             f = va_arg(args, double);
 
@@ -242,6 +303,7 @@ static size_t printOneArg(Print &out, StringReader &fmt, va_list &args) {
                 n += printNum(out, frac, '0', 0, fracWidth);
             }
             goto FINISH;
+#endif
         case 'p':
             ui32 = (uint32_t) va_arg(args, void *);
             hex = ucHex;
